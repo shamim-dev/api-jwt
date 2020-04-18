@@ -3,6 +3,8 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use App\Http\Helper\CustomBlueprint;
+
 
 class CreateBusinessTypesTable extends Migration
 {
@@ -13,14 +15,16 @@ class CreateBusinessTypesTable extends Migration
      */
     public function up()
     {
-        Schema::create('business_types', function (Blueprint $table) {
+        $schema = DB::connection()->getSchemaBuilder();
+        $schema->blueprintResolver(function ($table, $callback) {
+            return new CustomBlueprint($table, $callback);
+        });
+
+        $schema->create('business_types', function (CustomBlueprint $table) {
             $table->id();
             $table->string('name');
+            $table->commonFields();
 
-            $table->statusInt();
-            $table->timestamps();
-            $table->createUpdateBy();
-            $table->softDeletes();
         });
     }
 

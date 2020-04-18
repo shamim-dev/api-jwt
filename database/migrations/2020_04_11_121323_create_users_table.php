@@ -2,6 +2,8 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use App\Http\Helper\CustomBlueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 class CreateUsersTable extends Migration
@@ -13,7 +15,13 @@ class CreateUsersTable extends Migration
      */
     public function up()
     {
-        Schema::create('users', function (Blueprint $table) {
+        $schema = DB::connection()->getSchemaBuilder();
+
+        $schema->blueprintResolver(function ($table, $callback) {
+            return new CustomBlueprint($table, $callback);
+        });
+
+        $schema->create('users', function (CustomBlueprint $table) {
             $table->id();
             $table->tinyInteger('userType')->nullable()->unsigned();
             $table->string('userName')->unique()->nullable();
@@ -30,10 +38,7 @@ class CreateUsersTable extends Migration
             $table->string('zipCode',100)->nullable();
             $table->string('phone',100)->unique()->nullable();
 
-            $table->statusInt();
-            $table->timestamps();
-            $table->createUpdateBy();
-            $table->softDeletes();
+            $table->commonFields();
         });
     }
 
