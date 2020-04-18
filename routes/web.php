@@ -1,5 +1,4 @@
 <?php
-
 /*
 |--------------------------------------------------------------------------
 | Application Routes
@@ -15,21 +14,28 @@
     return $router->app->version();
 });*/
 
-// API route group
-$router->group(['prefix' => 'api/account'], function () use ($router) {
+// API route group account
+$router->group(['middleware'=>'InputTrim','prefix' => 'api/account'], function () use ($router) {
     // Matches "/api/register
-    $router->get('test', function(){ echo 'hi....'; });
+    $router->get('test', function(){ echo 'hi.... api'; });
     $router->post('register', 'AuthController@register');
-    // Matches "/api/login
+    $router->get('verify-token/{id}/{token}', 'AuthController@registerTokenVerification');
     $router->post('login', 'AuthController@login');
-    // Matches "/api/profile
+    $router->post('forget-password', 'PasswordController@forgetPassword');
+    $router->get('password-reset/{id}/{token}', 'PasswordController@resetPassword');
+    $router->post('password-reset-save', 'PasswordController@resetPasswordSave');
+    $router->get('logout', 'AuthController@logout');
+    $router->get('logout', 'AuthController@logout');
     $router->get('profile', 'UserController@profile');
-    // Matches "/api/users/1
-    //get one user by id
     $router->get('users/{id}', 'UserController@singleUser');
     $router->get('{id}/show', 'UserController@singleUser');
-
-    // Matches "/api/users
     $router->get('list', 'UserController@allUsers');
+
+});
+
+// API route group mail
+$router->group(['prefix' => 'api/mail'], function () use ($router) {
+    $router->get('sendMeTest', 'EmailController@sendTestEmail');
+    $router->get('user-email', 'UserController@sendEmail');
 
 });

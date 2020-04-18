@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Auth;
 use  App\User;
 
@@ -51,9 +52,31 @@ class UserController extends Controller
 
         } catch (\Exception $e) {
 
-            return response()->json(['message' => 'user not found!'], 404);
+            return response()->json(['message' => 'User not found!'], 404);
         }
 
     }
+
+    public function logout(){
+        Auth::logout();
+        return response()->json(['message' => 'Logout'], 200);
+    }
+
+
+    //send email
+    public function sendEmail() {
+        $to_name="Shamim reza";
+        $to_email="mrezashamim@gmail.com";
+        $data=[
+            'name'=>'Jhone due',
+            'body'=>'test email body'
+        ];
+        Mail::send('mail.test_mail',$data,function($message) use ($to_name,$to_email){
+            $message->to($to_email)->subject('Tizaara api email test');
+        });
+        echo 'success!';
+        //Mail::to('somebody@example.org')->send(new MyEmail());
+    }
+
 
 }

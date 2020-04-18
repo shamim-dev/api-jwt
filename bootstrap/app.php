@@ -98,6 +98,14 @@ $app->configure('app');
 $app->register(App\Providers\AuthServiceProvider::class);
 // Add this line
 $app->register(Tymon\JWTAuth\Providers\LumenServiceProvider::class);
+
+$app->configure('mail');
+$app->register(Illuminate\Mail\MailServiceProvider::class);
+
+$app->register(Flipbox\LumenGenerator\LumenGeneratorServiceProvider::class);
+$app->routeMiddleware([
+    'InputTrim' => App\Http\Middleware\InputTrim::class,
+]);
 /*
 |--------------------------------------------------------------------------
 | Load The Application Routes
