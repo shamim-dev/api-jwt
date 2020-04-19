@@ -8,6 +8,7 @@ use Illuminate\Validation\ValidationException;
 use Laravel\Lumen\Exceptions\Handler as ExceptionHandler;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Throwable;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class Handler extends ExceptionHandler
 {
@@ -49,6 +50,15 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Throwable $exception)
     {
-        return parent::render($request, $exception);
+        // modified by shamim for 404 exception handle
+        $appName=ENV('APP_NAME');
+        if ($exception instanceof NotFoundHttpException){
+            return response('Welcome to '.$appName.' ,<br> But your requested Page/url not found', 404);
+        }
+         return parent::render($request, $exception);
+
     }
+
+
+
 }

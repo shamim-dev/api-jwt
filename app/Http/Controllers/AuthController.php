@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Http\Helper\CommonHelper;
 use Illuminate\Support\Facades\Mail;
@@ -40,33 +41,32 @@ class AuthController extends Controller
             $user->phone = $request->input('phone');
             $plainPassword = $request->input('password');
             $user->password = app('hash')->make($plainPassword);
-           // $user->save();
+            // $user->save();
             $verify_token = CommonHelper::strRandom(40);
             $user->verificationToken = $verify_token;
             $user->isVerified = 0;
             $user->save();
 
-            $toEmail=$user->email;
-            $toName=$user->firstName.' '.$user->userName;
-            $data=[
-                'id'=>$user->id,
-                'email'=>$toEmail,
-                'name'=>$toName,
-                'verificationToken'=>$user->verificationToken
+            $toEmail = $user->email;
+            $toName = $user->firstName . ' ' . $user->userName;
+            $data = [
+                'id' => $user->id,
+                'email' => $toEmail,
+                'name' => $toName,
+                'verificationToken' => $user->verificationToken
             ];
 
-            if($user->email){
-               // dd($data);
-                Mail::send('mail.reg_verification_email',$data,function($message) use ($toName,$toEmail){
+            if ($user->email) {
+                // dd($data);
+                Mail::send('mail.reg_verification_email', $data, function ($message) use ($toName, $toEmail) {
                     $message->to($toEmail)->subject('Tizaara Registration Verification');
                 });
-               // Mail::to($user->email)->send(new AppSignUp($user));
+                // Mail::to($user->email)->send(new AppSignUp($user));
                 return response()->json(['user' => $user, 'message' => 'Registration form submitted successfully,Please check email to verify your account!'], 201);
-            }else{
+            } else {
                 //return successful response
                 return response()->json(['user' => $user, 'message' => 'Registration form submitted successfully!'], 201);
             }
-
 
 
         } catch (\Exception $e) {
@@ -91,22 +91,23 @@ class AuthController extends Controller
             'password' => 'required|string',
         ]);
         //$credentials = $request->only(['email', 'password']);
-        $credentials=[];
+        $credentials = [];
         if ($login == 'email') {
             $credentials = [
-                'email'=>$request->login,
-                'password'=>$request->password,
-                'status'=>1
+                'email' => $request->login,
+                'password' => $request->password,
+                'status' => 1
             ];
         } else {
             $credentials = [
-                'phone'=>$request->login,
-                'password'=>$request->password,
-                'status'=>1
+                'phone' => $request->login,
+                'password' => $request->password,
+                'status' => 1
             ];
         }
-
-        if (!$token = Auth::attempt($credentials)) {
+        // set Expiry TTL
+       // $credentials, ['exp' => Carbon\Carbon::now()->addDays(7)->timestamp]
+        if (!$token = Auth::attempt($credentials, ['expires_in' => Carbon::now()->addDays(7)->timestamp])) {
             return response()->json(['message' => 'User Not Found | Unauthorized'], 401);
         }
 
@@ -125,22 +126,22 @@ class AuthController extends Controller
 
     public function registerTokenVerification($id, $verify_token)
     {
-        $user = User::where(['id'=> $id,'verificationToken'=> $verify_token])->first();
+        $user = User::where(['id' => $id, 'verificationToken' => $verify_token])->first();
 
         if (empty($user)) {
             return 'Invalid request!!';
         } else {
             $user->isVerified = 1;
-            $user->status =1;
+            $user->status = 1;
             $user->verificationToken = null;
             $user->save();
-            $toName=$user->firstName." ".$user->lastName;
-            $toEmail=$user->email;
-            $data=[
-                'email'=>$toEmail,
-                'name'=>$toName,
+            $toName = $user->firstName . " " . $user->lastName;
+            $toEmail = $user->email;
+            $data = [
+                'email' => $toEmail,
+                'name' => $toName,
             ];
-            Mail::send('mail.verified_success_email',$data,function($message) use ($toName,$toEmail){
+            Mail::send('mail.verified_success_email', $data, function ($message) use ($toName, $toEmail) {
                 $message->to($toEmail)->subject('Tizaara Registration Verification Success!');
             });
             return View('signup_verify_success');
