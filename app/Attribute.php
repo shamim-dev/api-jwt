@@ -15,7 +15,6 @@ class Attribute extends Model
     public function attributeGroup()
     {
         return $this->belongsTo('App\AttributeGroup');
-        //return $this->belongsTo(AttributeGroup::class);
     }
 }
 

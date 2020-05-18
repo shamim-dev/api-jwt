@@ -17,10 +17,10 @@ $router->get('/', function () use ($router) {
 
 // API route group account
 $router->group(['prefix' => 'account','middleware'=>'InputTrim'], function () use ($router) {
-    // Matches "/api/account
+    // Matches "/account
     $router->get('test', function(){ echo 'hi.... api'; });
     $router->post('register', 'AuthController@register');
-    $router->get('verify-token/{id}/{verify_token}', 'AuthController@registerTokenVerification');
+    $router->get('verify-token/{id}/{token}', 'AuthController@registerTokenVerification');
     $router->post('login', 'AuthController@login');
     $router->post('forget-password', 'PasswordController@forgetPassword');
     $router->get('password-reset/{id}/{token}', 'PasswordController@resetPassword');
@@ -30,6 +30,8 @@ $router->group(['prefix' => 'account','middleware'=>'InputTrim'], function () us
     $router->get('users/{id}', 'UserController@singleUser');
     $router->get('{id}/show', 'UserController@singleUser');
     $router->get('list', 'UserController@allUsers');
+    $router->post('verify-otp', 'AuthController@verifyOtp');
+    $router->get('test-otp/{phone}', 'AuthController@testOtp');
 
 });
 
@@ -80,10 +82,72 @@ $router->group(['prefix' => 'product/attribute','middleware'=>'InputTrim'], func
 
 });
 
+// API route Company
+$router->group(['prefix' => 'company','middleware'=>'InputTrim'], function () use ($router) {
+    $router->get('list', 'CompanyController@index');
+    $router->post('create', 'CompanyController@store');
+    $router->get('{id}/show', 'CompanyController@show');
+    $router->get('{id}/edit', 'CompanyController@edit');
+    $router->post('{id}/update','CompanyController@update');
+    $router->post('search','CompanyController@search');
+    $router->delete('{id}/delete','CompanyController@destroy');
+
+});
+
+// API route Category
+$router->group(['prefix' => 'category','middleware'=>'InputTrim'], function () use ($router) {
+    $router->get('list', 'CategoryController@index');
+    $router->post('create', 'CategoryController@store');
+    $router->get('{id}/show', 'CategoryController@show');
+    $router->get('{id}/edit', 'CategoryController@edit');
+    $router->post('{id}/update','CategoryController@update');
+    $router->post('search','CategoryController@search');
+    $router->delete('{id}/delete','CategoryController@destroy');
+
+});
+
+
+
 // API route group mail
 $router->group(['prefix' => 'mail'], function () use ($router) {
     $router->get('sendMeTest', 'EmailController@sendTestEmail');
     $router->get('user-email', 'UserController@sendEmail');
     $router->post('forget-password', 'PasswordController@forgetPassword');
+
+});
+
+// API route country
+$router->group(['prefix' => 'country','middleware'=>'InputTrim'], function () use ($router) {
+    $router->get('list', 'CountryController@index');
+    $router->post('create', 'CountryController@store');
+    $router->get('{id}/show', 'CountryController@show');
+    $router->get('{id}/edit', 'CountryController@edit');
+    $router->post('{id}/update','CountryController@update');
+    $router->post('search','CountryController@search');
+    $router->delete('{id}/delete','CountryController@destroy');
+
+});
+
+// API route zone
+$router->group(['prefix' => 'zone','middleware'=>'InputTrim'], function () use ($router) {
+    $router->get('list', 'ZoneController@index');
+    $router->post('create', 'ZoneController@store');
+    $router->get('{id}/show', 'ZoneController@show');
+    $router->get('{id}/edit', 'ZoneController@edit');
+    $router->post('{id}/update','ZoneController@update');
+    $router->post('search','ZoneController@search');
+    $router->delete('{id}/delete','ZoneController@destroy');
+
+});
+
+// API route menu operation
+$router->group(['prefix' => 'menu_operations','middleware'=>'InputTrim'], function () use ($router) {
+    $router->get('list', 'MenuOperationController@index');
+    $router->post('create', 'MenuOperationController@store');
+    $router->get('{id}/show', 'MenuOperationController@show');
+    $router->get('{id}/edit', 'MenuOperationController@edit');
+    $router->post('{id}/update','MenuOperationController@update');
+    $router->post('search','MenuOperationController@search');
+    $router->delete('{id}/delete','MenuOperationController@destroy');
 
 });

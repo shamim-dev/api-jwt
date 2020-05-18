@@ -52,4 +52,9 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         return [];
     }
 
+    public function user_privileges()
+    {
+        return $this->belongsTo('App\Model\User_Privileges');
+    }
+
 }
