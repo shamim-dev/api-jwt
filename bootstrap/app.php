@@ -73,8 +73,8 @@ $app->configure('app');
 */
 
  $app->middleware([
-     //App\Http\Middleware\ExampleMiddleware::class,
-	 'Nord\Lumen\Cors\CorsMiddleware',
+//     App\Http\Middleware\ExampleMiddleware::class,
+     'Nord\Lumen\Cors\CorsMiddleware',
  ]);
 
  $app->routeMiddleware([

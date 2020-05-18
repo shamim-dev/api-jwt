@@ -27,12 +27,13 @@ class AttributeController extends Controller
         ]);
 
         try {
+
            /* $attributes = new Attribute;
             $attributes->name = $request->name;
             $attributes->attribute_group_id = $request->attribute_group_id;
             $attributes->ip_address = $request->ip();
             $attributes->save();*/
-
+            
             $postData=$request->all();
             $postData['ip_address']=$request->ip();
             $data= Attribute::create($postData);

@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Brand;
+use App\Model\Operations;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
-class BrandController extends Controller
+class MenuOperationController extends Controller
 {
     public function __construct()
     {
@@ -15,31 +15,22 @@ class BrandController extends Controller
 
     public function index()
     {
-        return response()->json(['brands' => Brand::all()], 200);
+        return response()->json(['data' => Operations::all()], 200);
     }
 
 
     public function store(Request $request)
     {
         $this->validate($request, [
-            'name' => 'required|string',
-            'code' => 'required|string|unique:brands',
-            'image' => 'required|string',
-            'sort_order' => 'required|numeric'
+            'name' => 'required|string|unique:operations'
         ]);
 
         try {
-            $brand = new Brand;
-            $brand->name = $request->name;
-            $brand->code = $request->code;
-            $brand->image = $request->image;
-            $brand->sort_order = $request->sort_order;
-            $brand->ip_address = $request->ip();
-            $brand->save();
-            return response()->json(['brands' => $brand, 'message' => 'Created successfully!'], 201);
-
+            $postData=$request->all();
+            $postData['ip_address']=$request->ip();
+            $data= Operations::create($postData);
+            return response()->json(['data' => $data, 'message' => 'Created successfully!'], 201);
         } catch (\Exception $e) {
-
             return response()->json(['message' => 'Error found',], 409);
         }
     }
@@ -48,9 +39,9 @@ class BrandController extends Controller
     public function show($id)
     {
         try {
-            $brands = Brand::findOrFail($id);
+            $data = Operations::findOrFail($id);
 
-            return response()->json(['brands' => $brands], 200);
+            return response()->json(['data' => $data], 200);
 
         } catch (\Exception $e) {
 
@@ -62,9 +53,8 @@ class BrandController extends Controller
     public function edit($id)
     {
         try {
-            $brands = Brand::findOrFail($id);
-
-            return response()->json(['brands' => $brands], 200);
+            $data = Operations::findOrFail($id);
+            return response()->json(['data' => $data], 200);
 
         } catch (\Exception $e) {
 
@@ -77,15 +67,14 @@ class BrandController extends Controller
         $this->validate($request,['searchStr'=>'required|string']);
         try {
             $searchItem = $request->searchStr;
-            $brand = Brand::query()
+            $data = Operations::query()
                 ->where('name', 'LIKE', "%{$searchItem}%")
-                ->orWhere('code', 'LIKE', "%{$searchItem}%")
                 ->get();
                 
-            if(!$brand->isEmpty()){
-                return response()->json(['datas' => $brand,'message' => 'Result  with this query'], 200);
+            if(!$data->isEmpty()){
+                return response()->json(['datas' => $data,'message' => 'Result  with this query'], 200);
             }else{
-                return response()->json(['datas' => $brand,'message' => 'No data found!'], 404);
+                return response()->json(['datas' => $data,'message' => 'No data found!'], 404);
             }
 
 
@@ -99,11 +88,7 @@ class BrandController extends Controller
     public function update(Request $request, $id)
     {
         $this->validate($request, [
-            'name' => 'required|string',
-            'code' => 'sometimes|required|string|unique:brands,code,' . $id,
-            'image' => 'required|string',
-            'sort_order' => 'required|numeric',
-            'status' => 'required|numeric'
+            'name' => 'required|string|unique:operations'
         ]);
 
         try {
@@ -111,7 +96,7 @@ class BrandController extends Controller
             $data['updated_by'] = 1;
             $data['updated_at'] = Carbon::now();
             $data['ip_address'] = $request->ip();
-            Brand::where('id', $id)->update($request->all());
+            Operations::where('id', $id)->update($request->all());
             return response()->json(['message' => 'Data updated successfully'], 200);
         } catch (\Exception $e) {
             $errCode=$e->getCode();
@@ -124,7 +109,7 @@ class BrandController extends Controller
     public function destroy($id)
     {
         try {
-            Brand::findOrFail($id)->delete();
+            Operations::findOrFail($id)->delete();
             return response()->json(['message' => 'Data deleted successfully'], 200);
 
         } catch (\Exception $e) {
