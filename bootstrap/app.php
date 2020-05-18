@@ -72,9 +72,10 @@ $app->configure('app');
 |
 */
 
-// $app->middleware([
-//     App\Http\Middleware\ExampleMiddleware::class
-// ]);
+ $app->middleware([
+     //App\Http\Middleware\ExampleMiddleware::class,
+	 'Nord\Lumen\Cors\CorsMiddleware',
+ ]);
 
  $app->routeMiddleware([
      'auth' => App\Http\Middleware\Authenticate::class,
@@ -98,7 +99,7 @@ $app->configure('app');
 $app->register(App\Providers\AuthServiceProvider::class);
 // Add this line
 $app->register(Tymon\JWTAuth\Providers\LumenServiceProvider::class);
-
+$app->register('Nord\Lumen\Cors\CorsServiceProvider');
 $app->configure('mail');
 $app->register(Illuminate\Mail\MailServiceProvider::class);
 

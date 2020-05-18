@@ -16,16 +16,16 @@ $router->get('/', function () use ($router) {
 });
 
 // API route group account
-$router->group(['prefix' => 'api/account','middleware'=>'InputTrim'], function () use ($router) {
+$router->group(['prefix' => 'account','middleware'=>'InputTrim'], function () use ($router) {
     // Matches "/api/account
     $router->get('test', function(){ echo 'hi.... api'; });
     $router->post('register', 'AuthController@register');
-    $router->get('verify-token/{id}/{token}', 'AuthController@registerTokenVerification');
+    $router->get('verify-token/{id}/{verify_token}', 'AuthController@registerTokenVerification');
     $router->post('login', 'AuthController@login');
     $router->post('forget-password', 'PasswordController@forgetPassword');
     $router->get('password-reset/{id}/{token}', 'PasswordController@resetPassword');
     $router->post('password-reset-save', 'PasswordController@resetPasswordSave');
-    $router->get('logout', 'AuthController@logout');
+    $router->post('logout', 'AuthController@logout');
     $router->get('profile', 'UserController@profile');
     $router->get('users/{id}', 'UserController@singleUser');
     $router->get('{id}/show', 'UserController@singleUser');
@@ -34,7 +34,7 @@ $router->group(['prefix' => 'api/account','middleware'=>'InputTrim'], function (
 });
 
 // API route group Business Types
-$router->group(['prefix' => 'api/btype','middleware'=>'InputTrim'], function () use ($router) {
+$router->group(['prefix' => 'btype','middleware'=>'InputTrim'], function () use ($router) {
     $router->get('list', 'BusinessTypeController@index');
     $router->post('create', 'BusinessTypeController@store');
     $router->get('{id}/show', 'BusinessTypeController@show');
@@ -46,7 +46,7 @@ $router->group(['prefix' => 'api/btype','middleware'=>'InputTrim'], function () 
 });
 
 // API route group Brands
-$router->group(['prefix' => 'api/brand','middleware'=>'InputTrim'], function () use ($router) {
+$router->group(['prefix' => 'brand','middleware'=>'InputTrim'], function () use ($router) {
     $router->get('list', 'BrandController@index');
     $router->post('create', 'BrandController@store');
     $router->get('{id}/show', 'BrandController@show');
@@ -58,7 +58,7 @@ $router->group(['prefix' => 'api/brand','middleware'=>'InputTrim'], function () 
 });
 
 // API route group product/attribute/group
-$router->group(['prefix' => 'api/product/attribute/group','middleware'=>'InputTrim'], function () use ($router) {
+$router->group(['prefix' => 'product/attribute/group','middleware'=>'InputTrim'], function () use ($router) {
     $router->get('list', 'AttributeGroupController@index');
     $router->post('create', 'AttributeGroupController@store');
     $router->get('{id}/show', 'AttributeGroupController@show');
@@ -70,7 +70,7 @@ $router->group(['prefix' => 'api/product/attribute/group','middleware'=>'InputTr
 });
 
 // API route group product/attribute
-$router->group(['prefix' => 'api/product/attribute','middleware'=>'InputTrim'], function () use ($router) {
+$router->group(['prefix' => 'product/attribute','middleware'=>'InputTrim'], function () use ($router) {
     $router->get('/', 'AttributeController@index');//$router->get('list', 'AttributeController@index');
     $router->post('/', 'AttributeController@store');// $router->post('create', 'AttributeController@store');
     $router->get('{id}', 'AttributeController@show');//$router->get('{id}/show', 'AttributeController@show');
@@ -81,7 +81,7 @@ $router->group(['prefix' => 'api/product/attribute','middleware'=>'InputTrim'], 
 });
 
 // API route group mail
-$router->group(['prefix' => 'api/mail'], function () use ($router) {
+$router->group(['prefix' => 'mail'], function () use ($router) {
     $router->get('sendMeTest', 'EmailController@sendTestEmail');
     $router->get('user-email', 'UserController@sendEmail');
     $router->post('forget-password', 'PasswordController@forgetPassword');
