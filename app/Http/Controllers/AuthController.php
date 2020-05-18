@@ -8,7 +8,7 @@ use App\Http\Helper\CommonHelper;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Auth;
 use  App\User;
-
+use Validator;
 
 class AuthController extends Controller
 {
@@ -21,21 +21,24 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         //validate incoming request
-        $this->validate($request, [
+        $validator = Validator::make($request->all(), [
             'firstName' => 'required|string',
             'lastName' => 'required|string',
-            'userName' => 'required|string|unique:users',
+            //'userName' => 'required|string|unique:users',
             'email' => 'required|email|unique:users',
             'phone' => 'unique:users',
             'userType' => 'required|numeric',
             'password' => 'required|confirmed|min:6',// password_confirmation ( field is Required)
         ]);
+        if ($validator->fails()) {
+            return response()->json(['errors'=>$validator->errors(),'messages'=>'Operation Not success!'], 422);
+        }
 
         try {
             $user = new User;
             $user->firstName = $request->input('firstName');
             $user->lastName = $request->input('lastName');
-            $user->userName = $request->input('userName');
+            $user->userName = empty($request->input('userName'))?$request->input('email'):$request->input('userName');
             $user->email = $request->input('email');
             $user->userType = $request->input('userType');
             $user->phone = $request->input('phone');
@@ -48,7 +51,7 @@ class AuthController extends Controller
             $user->save();
 
             $toEmail = $user->email;
-            $toName = $user->firstName . ' ' . $user->userName;
+            $toName = $user->firstName . ' ' . $user->lastName;
             $data = [
                 'id' => $user->id,
                 'email' => $toEmail,
@@ -62,10 +65,12 @@ class AuthController extends Controller
                     $message->to($toEmail)->subject('Tizaara Registration Verification');
                 });
                 // Mail::to($user->email)->send(new AppSignUp($user));
-                return response()->json(['user' => $user, 'message' => 'Registration form submitted successfully,Please check email to verify your account!'], 201);
+                unset($data['verificationToken']);
+                return response()->json(['user' => $data, 'message' => 'Registration form submitted successfully,Please check email to verify your account!'], 201);
             } else {
                 //return successful response
-                return response()->json(['user' => $user, 'message' => 'Registration form submitted successfully!'], 201);
+                unset($data['verificationToken']);
+                return response()->json(['user' => $data, 'message' => 'Registration form submitted successfully!'], 201);
             }
 
 
@@ -86,10 +91,19 @@ class AuthController extends Controller
     {
         //validate incoming request
         $login = $this->findLoginWith($request);
-        $this->validate($request, [
+      /*  $this->validate($request, [
             'login' => 'required|string',
             'password' => 'required|string',
         ]);
+        */
+        $validator = Validator::make($request->all(), [
+            'login' => 'required|string',
+            'password' => 'required|string|min:6',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['errors'=>$validator->errors()], 422);
+        }
+
         //$credentials = $request->only(['email', 'password']);
         $credentials = [];
         if ($login == 'email') {
@@ -108,7 +122,7 @@ class AuthController extends Controller
         // set Expiry TTL
        // $credentials, ['exp' => Carbon\Carbon::now()->addDays(7)->timestamp]
         if (!$token = Auth::attempt($credentials, ['expires_in' => Carbon::now()->addDays(7)->timestamp])) {
-            return response()->json(['message' => 'User Not Found | Unauthorized'], 401);
+            return response()->json(['errors'=>['message' => 'User Not Found | Unauthorized']], 404);
         }
 
         return $this->respondWithToken($token);
@@ -144,6 +158,7 @@ class AuthController extends Controller
             Mail::send('mail.verified_success_email', $data, function ($message) use ($toName, $toEmail) {
                 $message->to($toEmail)->subject('Tizaara Registration Verification Success!');
             });
+            echo 'Verification email is success! Click to login <a href="http://www.web.tizaara.com/account/login">www.tizaara.com/account/login</a>'; return;
             return View('signup_verify_success');
             return 'Verification email is success!';
 
